@@ -5,7 +5,7 @@ import time
 import argparse
 parser = argparse.ArgumentParser() 
 parser.add_argument("-p", "--Path", help = "Add path for storing images") 
-parser.add_argument("-n", "--No_img", help = "Number of images") 
+parser.add_argument("-m", "--No_img", help = "Number of images") 
 parser.add_argument("-s", "--Start", help = "Start index") 
 
 args = parser.parse_args() 
