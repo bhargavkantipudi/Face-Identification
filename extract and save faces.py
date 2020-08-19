@@ -17,25 +17,34 @@ mydb = client["facedb"]
 mycol = mydb["facedata"]
 
 def extract_face(filename, required_size=(160, 160)):
-	image = Image.open(filename)
-	image = image.convert('RGB')
-	pixels = asarray(image)
-	detector = MTCNN()
-	results = detector.detect_faces(pixels)
-	x1, y1, width, height = results[0]['box']
-	x1, y1 = abs(x1), abs(y1)
-	x2, y2 = x1 + width, y1 + height
-	face = pixels[y1:y2, x1:x2]
-	image = Image.fromarray(face)
-	image = image.resize(required_size)
-	face_array = asarray(image)
-	return face_array
+	try:	
+		image = Image.open(filename)
+		image = image.convert('RGB')
+		pixels = asarray(image)
+		detector = MTCNN()
+		results = detector.detect_faces(pixels)
+		if results==[]:
+			return []
+		x1, y1, width, height = results[0]['box']
+		x1, y1 = abs(x1), abs(y1)
+		x2, y2 = x1 + width, y1 + height
+		face = pixels[y1:y2, x1:x2]
+		image = Image.fromarray(face)
+		image = image.resize(required_size)
+		face_array = asarray(image)
+		return face_array
+	except:
+		print("not able to load ",filename)
+		return
 
 def load_faces(directory):
 	faces = list()
 	for filename in listdir(directory):
 		path = directory + filename
 		face = extract_face(path)
+		if face==[]:
+			print("NO face found",path)
+			continue
 		faces.append(face)
 	return faces
 
@@ -60,9 +69,7 @@ def get_embedding(model, face_pixels):
 	return yhat[0]
 
 # load train dataset
-trainX, trainy = load_dataset('raw_dataset/train/')
-print(trainX.shape, trainy.shape)
-testX, testy = load_dataset('raw_dataset/val/')
+trainX, trainy = load_dataset('raw_dataset/')
 model = load_model('model/facenet_keras.h5')
 print('Loaded Model')
 newTrainX = list()
